@@ -9,11 +9,13 @@ begin
 
    for emprec in empcur
    loop
-       v_names := v_names || ':' || emprec.first_name;
+       v_names := v_names || ',' || emprec.first_name;
    end loop;
    
-   return  ltrim(v_names,':');
+   return  ltrim(v_names,',');
 end;
 
+Query to use function
+=========================
 select job_title, get_employees_by_job(job_id)
 from  jobs
