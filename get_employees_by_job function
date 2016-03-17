@@ -1,0 +1,19 @@
+create or replace function get_employees_by_job(p_jobid varchar2)
+return varchar2
+is
+  v_names varchar2(1000) := '';
+  cursor empcur is
+    select first_name from employees where job_id = p_jobid
+    order by 1;
+begin
+
+   for emprec in empcur
+   loop
+       v_names := v_names || ':' || emprec.first_name;
+   end loop;
+   
+   return  ltrim(v_names,':');
+end;
+
+select job_title, get_employees_by_job(job_id)
+from  jobs
