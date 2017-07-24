@@ -1,0 +1,30 @@
+set serveroutput on
+declare
+  cursor  deptcur is
+  select  department_id, department_name
+  from  departments
+  where department_id in ( select department_id from employees)
+  order by 2;
+  
+  cursor  empcur (p_deptid number)
+  is
+  select  first_name 
+  from employees
+  where department_id = p_deptid
+  order by 1;
+
+  v_count number(3);
+  
+begin
+  for deptrec in deptcur
+  loop
+      dbms_output.put_line(deptrec.department_name);
+      v_count :=0;
+      for emprec in empcur(deptrec.department_id)
+      loop
+         dbms_output.put_line('    ' || emprec.first_name);
+         v_count := v_count + 1;
+      end loop; 
+      dbms_output.put_line('    ' || 'No. of employees : ' || v_count);
+  end loop;       
+end;
