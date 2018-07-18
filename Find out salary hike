@@ -1,0 +1,50 @@
+-- Find out how much hike can be given to each employee based on following conditions
+-- 20% if employee is HOD
+-- 15% if employee manages other employee(s)
+-- 10% if employee is salary < avg salary of dept and emperience is > 10 
+
+set serveroutput on
+declare
+  cursor empcur is
+  select employee_id, first_name, salary, 
+     department_id, floor(months_between(sysdate,hire_date)/12) years
+  from employees;
+  v_per number(2);
+  v_count number(2);
+  v_avgsal employees.salary%type;
+begin
+  for emp in empcur
+  loop
+    v_per := 0;
+    select count(*) into v_count
+    from departments 
+    where manager_id = emp.employee_id;
+    if v_count > 0 then
+       v_per := 20;
+    else
+      select count(*) into v_count
+      from employees
+      where manager_id = emp.employee_id;
+      if v_count > 0 then
+          v_per := 15;
+      else
+         select avg(salary) into v_avgsal
+         from employees
+         where department_id = emp.department_id;
+         if emp.salary < v_avgsal and emp.years > 10 then
+            v_per := 10;
+         end if;
+      end if;         
+    end if;
+    
+    dbms_output.put_line(
+       rpad(emp.employee_id,5) || 
+       rpad(emp.first_name,15) ||
+       lpad(emp.salary,7) || 
+       lpad(v_per,5));
+  end loop;
+end;
+
+       
+       
+  
